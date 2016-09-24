@@ -10,7 +10,7 @@ import sun.misc.{Signal, SignalHandler}
   */
 object Main extends App {
 
-    val path = Paths.get(".")
+    val path = Paths.get(if (args.isEmpty) "." else args(0))
     val targetPath = path.resolve("source")
     if (!Files.exists(targetPath)) {
         Files.createDirectory(targetPath)
@@ -18,8 +18,9 @@ object Main extends App {
 
     val rules: Seq[ProcessingRule] = Seq(
         Rule.any(new FileCopier(targetPath)),
-        Rule.any(new NameNormalizer(_.toUpperCase(), compile("\\s+").matcher(_).replaceAll("_"))),
-        Rule(compile("\\.svg$", CASE_INSENSITIVE), new InkscapeConverter("png", binary = "C:\\Program Files\\Inkscape\\inkscape.exe"))
+        Rule.any(new NameNormalizer(_.toLowerCase(), compile("\\s+").matcher(_).replaceAll("_"))),
+        Rule(compile("\\.svg$", CASE_INSENSITIVE), new InkscapeConverter("png", deleteOriginal = false)),
+        Rule(compile("\\.svg$", CASE_INSENSITIVE), new InkscapeConverter("pdf"))
     )
 
     val monitor = new FolderMonitor(path, rules)

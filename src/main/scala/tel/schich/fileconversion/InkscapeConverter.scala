@@ -13,8 +13,10 @@ class InkscapeConverter(to: String, deleteOriginal: Boolean = true, binary: Stri
         InkscapeConverter.runCommand(binary, path.toString, "--export-" + to, target.toString)
         if (deleteOriginal) {
             Files.deleteIfExists(path)
+            (None, Seq(target))
+        } else {
+            (Some(path), Seq(target))
         }
-        (Some(path), Seq(target))
     }
 
     private def removeExtension(path: Path): String = {
